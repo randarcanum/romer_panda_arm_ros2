@@ -1,8 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="panda">
-  <!-- safety_distance: Minimum safety distance in [m] by which the collision volumes are expanded and which is enforced during robot motions -->
-  <!-- arm_id: Namespace of the panda arm. Serves to differentiate between arms in case of multiple instances. -->
   <xacro:macro name="panda_arm" params="arm_id:='panda' description_pkg:='franka_description' connected_to:='' xyz:='0 0 0' rpy:='0 0 0' safety_distance:=0">
+    <!-- Create dummy root link if connected_to is empty -->
+    
+
+    <!-- If connected_to is provided, connect link0 to it -->
     <xacro:unless value="${not connected_to}">
       <joint name="${arm_id}_joint_${connected_to}" type="fixed">
         <parent link="${connected_to}"/>
@@ -10,10 +12,16 @@
         <origin rpy="${rpy}" xyz="${xyz}"/>
       </joint>
     </xacro:unless>
+
     <link name="${arm_id}_link0">
+      <inertial>
+        <origin xyz="-0.0172 0.0004 0.0745" rpy="0 0 0"/>
+        <mass value="2.3966"/>
+        <inertia ixx="0.0090" ixy="0.0000" ixz="0.0020" iyy="0.0115" iyz="0.0000" izz="0.0085"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link0.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link0.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -36,9 +44,14 @@
       </collision>
     </link>
     <link name="${arm_id}_link1">
+      <inertial>
+        <origin xyz="0.00033 -0.02204 -0.04762" rpy="0 0 0"/>
+        <mass value="2.7907"/>
+        <inertia ixx="0.01564782655" ixy="0.00000531236" ixz="-0.00003676721" iyy="0.01439883526" iyz="-0.00248480843" izz="0.00500443991"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link1.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link1.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -69,9 +82,14 @@
       <limit effort="87" lower="-2.7473" upper="2.7473" velocity="2.1750" acceleration="1.0"/>
     </joint>
     <link name="${arm_id}_link2">
+      <inertial>
+        <origin xyz="0.00038 -0.09211 0.01908" rpy="0 0 0"/>
+        <mass value="2.5420"/>
+        <inertia ixx="0.01662427728" ixy="0.00003086077" ixz="0.00000835940" iyy="0.00462501261" iyz="0.00355899830" izz="0.01545124526"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link2.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link2.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -102,9 +120,14 @@
       <limit effort="87" lower="-1.6728" upper="1.6728" velocity="2.1750" acceleration="1.0"/>
     </joint>
     <link name="${arm_id}_link3">
+      <inertial>
+        <origin xyz="0.05152 0.01696 -0.02971" rpy="0 0 0"/>
+        <mass value="2.2513"/>
+        <inertia ixx="0.00631741992" ixy="0.00097309955" ixz="0.00292525834" iyy="0.00866285493" iyz="0.00093469224" izz="0.00657804051"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link3.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link3.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -135,9 +158,14 @@
       <limit effort="87" lower="-2.7473" upper="2.7473" velocity="2.1750" acceleration="1.0"/>
     </joint>
     <link name="${arm_id}_link4">
+      <inertial>
+        <origin xyz="-0.05113 0.05825 0.01698" rpy="0 0 0"/>
+        <mass value="2.2037"/>
+        <inertia ixx="0.00784585566" ixy="-0.00339591957" ixz="0.00158704074" iyy="0.00649543136" iyz="-0.00181477884" izz="0.01003079917"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link4.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link4.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -168,9 +196,14 @@
       <limit effort="87" lower="-2.9218" upper="-0.2198" velocity="2.1750" acceleration="1.0"/>
     </joint>
     <link name="${arm_id}_link5">
+      <inertial>
+        <origin xyz="-0.00005 0.03730 -0.09280" rpy="0 0 0"/>
+        <mass value="2.2855"/>
+        <inertia ixx="0.02297014781" ixy="-0.00000949345" ixz="-0.00002063156" iyy="0.02095060919" iyz="0.00382345782" izz="0.00430606551"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link5.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link5.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -209,7 +242,6 @@
           <sphere radius="${0.025+safety_distance}" />
         </geometry>
       </collision>
-
     </link>
     <joint name="${arm_id}_joint5" type="revolute">
       <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.7473" soft_upper_limit="2.7473"/>
@@ -220,9 +252,14 @@
       <limit effort="12" lower="-2.7473" upper="2.7473" velocity="2.6100" acceleration="1.0"/>
     </joint>
     <link name="${arm_id}_link6">
+      <inertial>
+        <origin xyz="0.06572 -0.00371 0.00153" rpy="0 0 0"/>
+        <mass value="1.353"/>
+        <inertia ixx="0.00087964522" ixy="-0.00021487814" ixz="-0.00011911662" iyy="0.00277796968" iyz="0.00001274322" izz="0.00286701969"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link6.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link6.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -253,9 +290,14 @@
       <limit effort="12" lower="-0.0775" upper="3.6025" velocity="2.6100" acceleration="1.0"/>
     </joint>
     <link name="${arm_id}_link7">
+      <inertial>
+        <origin xyz="0.00089 -0.00044 0.05491" rpy="0 0 0"/>
+        <mass value="0.35973"/>
+        <inertia ixx="0.00019541063" ixy="0.00000165231" ixz="0.00000148826" iyy="0.00019210361" iyz="-0.00000131132" izz="0.00017936256"/>
+      </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://${description_pkg}/meshes/visual/link7.dae"/>
+          <mesh filename="package://${description_pkg}/meshes/visual/link7.stl"/>
         </geometry>
       </visual>
       <collision>
@@ -267,13 +309,13 @@
       <collision>
         <origin xyz="0 0 0.08" rpy="0 0 0"/>
         <geometry>
-          <sphere radius="${0.04+safety_distance}"  />
+          <sphere radius="${0.04+safety_distance}" />
         </geometry>
       </collision>
       <collision>
         <origin xyz="0 0 -0.06" rpy="0 0 0"/>
         <geometry>
-          <sphere radius="${0.04+safety_distance}"  />
+          <sphere radius="${0.04+safety_distance}" />
         </geometry>
       </collision>
     </link>
@@ -289,19 +331,19 @@
       <collision>
         <origin xyz="0.0424 0.0424 -0.0250" rpy="${pi} ${pi/2} ${pi/2}"/>
         <geometry>
-          <cylinder radius="${0.03+safety_distance}"  length="0.01" />
+          <cylinder radius="${0.03+safety_distance}" length="0.01" />
         </geometry>
       </collision>
       <collision>
         <origin xyz="0.0424 0.0424 -0.02" rpy="0 0 0"/>
         <geometry>
-          <sphere radius="${0.03+safety_distance}"  />
+          <sphere radius="${0.03+safety_distance}" />
         </geometry>
       </collision>
       <collision>
         <origin xyz="0.0424 0.0424 -0.03" rpy="0 0 0"/>
         <geometry>
-          <sphere radius="${0.03+safety_distance}"  />
+          <sphere radius="${0.03+safety_distance}" />
         </geometry>
       </collision>
     </link>

@@ -1,0 +1,167 @@
+/**:
+  controller_manager:
+    ros__parameters:
+      update_rate: 1000
+      thread_priority: 98
+
+      cartesian_elbow_example_controller:
+        type: franka_example_controllers/CartesianElbowExampleController
+
+      cartesian_orientation_example_controller:
+        type: franka_example_controllers/CartesianOrientationExampleController
+
+      cartesian_pose_elbow_example_controller:
+        type: franka_example_controllers/CartesianElbowExampleController
+
+      cartesian_pose_example_controller:
+        type: franka_example_controllers/CartesianPoseExampleController
+
+      cartesian_velocity_example_controller:
+        type: franka_example_controllers/CartesianVelocityExampleController
+
+      elbow_example_controller:
+        type: franka_example_controllers/ElbowExampleController
+
+      franka_robot_state_broadcaster:
+        type: franka_robot_state_broadcaster/FrankaRobotStateBroadcaster
+        state_interfaces:
+          robot_state
+
+      gravity_compensation_example_controller:
+        type: franka_example_controllers/GravityCompensationExampleController
+
+      gripper_example_controller:
+        type: franka_example_controllers/GripperExampleController
+
+      joint_impedance_example_controller:
+        type: franka_example_controllers/JointImpedanceExampleController
+
+      joint_impedance_with_ik_example_controller:
+        type: franka_example_controllers/JointImpedanceWithIKExampleController
+
+      joint_position_example_controller:
+        type: franka_example_controllers/JointPositionExampleController
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      joint_velocity_example_controller:
+        type: franka_example_controllers/JointVelocityExampleController
+
+      model_example_controller:
+        type: franka_example_controllers/ModelExampleController
+
+      move_to_start_example_controller:
+        type: franka_example_controllers/MoveToStartExampleController
+
+      romer_line_controller:
+        type: franka_example_controllers/RomerLineController
+
+      joint_position_controller:
+        type: franka_example_controllers/JointPositionController
+
+/**:
+  cartesian_elbow_example_controller:
+    ros__parameters:
+      arm_id: "fer"
+
+/**:
+  cartesian_orientation_example_controller:
+    ros__parameters:
+      arm_id: "fer"
+
+/**:
+  cartesian_pose_example_controller:
+    ros__parameters:
+      arm_id: "fer"
+
+/**:
+  cartesian_velocity_example_controller:
+    ros__parameters:
+      arm_id: "fer"   
+
+/**:
+  elbow_example_controller:
+    ros__parameters:
+      arm_id: "fer"
+      joints:
+        - fer_joint1
+        - fer_joint2
+        - fer_joint3
+        - fer_joint4
+        - fer_joint5
+        - fer_joint6
+        - fer_joint7
+
+/**:
+  franka_robot_state_broadcaster:
+    ros__parameters:
+      lock_try_count: 5 # Number of attempts to acquire the lock in a single on_update()
+      lock_sleep_interval: 5 # microseconds sleep between attempts
+      lock_log_error: true #  Log error if lock acquisition fails - false == do not log  
+      lock_update_success: false # return update OK, although lock fails (no update occurs)
+
+/**:
+  gravity_compensation_example_controller:
+    ros__parameters:
+      arm_id: "fer"
+
+/**:
+  romer_line_controller:
+    ros__parameters:
+      arm_id: "fer"
+      k_gains:
+        - 600.0
+        - 600.0
+        - 600.0
+        - 600.0
+        - 250.0
+        - 150.0
+        - 50.0
+      d_gains:
+        - 30.0
+        - 30.0
+        - 30.0
+        - 30.0
+        - 10.0
+        - 10.0
+        - 5.0
+      gazebo: true
+
+/**:
+  joint_state_broadcaster:
+    ros__parameters:
+      arm_id: "fer"
+      joints:
+        - fer_joint1
+        - fer_joint2
+        - fer_joint3
+        - fer_joint4
+        - fer_joint5
+        - fer_joint6
+        - fer_joint7
+
+/**:
+  move_to_start_example_controller:
+    ros__parameters:
+      k_gains:
+        - 600.0
+        - 600.0
+        - 600.0
+        - 600.0
+        - 250.0
+        - 150.0
+        - 50.0
+      d_gains:
+        - 30.0
+        - 30.0
+        - 30.0
+        - 30.0
+        - 10.0
+        - 10.0
+        - 5.0
+
+/**:
+  joint_position_controller:
+    ros__parameters:
+      gazebo: true

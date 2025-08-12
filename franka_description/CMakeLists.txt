@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(franka_description)
 find_package(ament_cmake REQUIRED)
+find_package(Franka REQUIRED)
 
 
 if(BUILD_TESTING)
@@ -14,7 +15,7 @@ endif()
 
 # Install launch files.
 install(DIRECTORY
-  launch robots meshes rviz
+  launch robots end_effectors meshes rviz
   DESTINATION share/${PROJECT_NAME}/
 )
 

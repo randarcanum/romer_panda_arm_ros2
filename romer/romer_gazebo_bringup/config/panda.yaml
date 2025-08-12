@@ -1,0 +1,12 @@
+ROBOT1:
+  arm_id: "panda"
+  arm_prefix: ""
+  fake_sensor_commands: "true"
+  joint_state_rate: 30
+  load_gripper: "false"
+  namespace: ""
+  robot_ip: ""
+  urdf_file: "panda/panda.urdf.xacro"
+  use_fake_hardware: "true"
+  use_rviz: "true"
+  gazebo: "true"

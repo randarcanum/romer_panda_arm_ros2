@@ -1,111 +1,223 @@
-# ROS2 port of franka_ros for Franka Emika Panda (FER) robots
+<h1 style="font-size: 3em;">ROS 2 Integration for Franka Robotics Research Robots</h1>
 
-This project is for porting over the various functionalities from franka_ros into ROS2 for Panda robots.
-Franka Emika has dropped software support for robots older than FR3, which leaves a lot of older hardware outdated and unable to migrate to ROS2.
+[![CI](https://github.com/frankarobotics/franka_ros2/actions/workflows/ci.yml/badge.svg)](https://github.com/frankarobotics/franka_ros2/actions/workflows/ci.yml)
 
-This repository attempts to remedy that somewhat, by bringing existing features from franka_ros over to ROS2 specifically for the Panda robots.
+> **Note:** _franka_ros2_ is not officially supported on Windows.
 
-As of 16.11.23, almost all single-robot `franka_ros` features have been migrated, including different controller interfaces, error recovery, and runtime parameter setters. Multi-arm support is also available via `franka_multi_hardware_interface`, launched via `dual_franka_launch.py`.
+#### Table of Contents
+- [About](#about)
+- [Caution](#caution)
+- [Setup](#setup)
+  - [Local Machine Installation](#local-machine-installation)
+  - [Docker Container Installation](#docker-container-installation)
+- [Test the Setup](#test-the-setup)
+- [Troubleshooting](#troubleshooting)
+  - [libfranka: UDP receive: Timeout error](#libfranka-udp-receive-timeout-error)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-For upgraded version of this repo including MuJoCo simulator version of Franka Panda arm, please visit [this repository][
-https://github.com/yilmazabdurrah/multi_franka_arm_ros2]
+# About
+The **franka_ros2** repository provides a **ROS 2** integration of **libfranka**, allowing efficient control of the Franka Robotics arm within the ROS 2 framework. This project is designed to facilitate robotic research and development by providing a robust interface for controlling the research versions of Franka Robotics robots.
 
-## Credits
-The original version is forked from mcbed's port of franka_ros2 for [humble][mcbed-humble].
+For convenience, we provide Dockerfile and docker-compose.yml files. While it is possible to build **franka_ros2** directly on your local machine, this approach requires manual installation of certain dependencies, while many others will be automatically installed by the **ROS 2** build system (e.g., via **rosdep**). This can result in a large number of libraries being installed on your system, potentially causing conflicts. Using Docker encapsulates these dependencies within the container, minimizing such risks. Docker also ensures a consistent and reproducible build environment across systems. For these reasons, we recommend using Docker.
 
-## Working (not thoroughly tested) features
-* Single arm:
-    * FrankaState broadcaster
-    * All control interfaces (torque, position, velocity, Cartesian).
-    * Example controllers for all interfaces
-    * Controllers are swappable using rqt_controller_manager
-    * Runtime franka::ControlException error recovery via `~/service_server/error_recovery`
-        * Upon recovery, the previously executed control loop will be executed again, so no reloading necessary.
-    * Runtime internal parameter setter services much like what is offered in the updated `franka_ros2`
-* Multi arm:
-    * initialization and joint state broadcaster
-    * Read/write interfaces
-    * FrankaState broadcaster
-    * Swappable controllers
-    * Error recovery and parameter setters
-    * Dual joint impedance & velocity example controllers
+# Caution
+This package is in rapid development. Users should expect breaking changes and are encouraged to report any bugs via [GitHub Issues page](https://github.com/frankarobotics/franka_ros2/issues).
 
-## Known issues
-* Joint position controller might cause some bad motor behaviors. Suggest using torque or velocity for now.
+# Franka ROS 2 Dependencies Setup
+
+This repository contains a `.repos` file that helps you clone the required dependencies for Franka ROS 2.
+
+## Prerequisites
+
+## Local Machine Installation
+1. **Install ROS 2 Development environment**
+
+    _**franka_ros2**_ is built upon _**ROS 2 Humble**_.
+
+    To set up your ROS 2 environment, follow the official _**humble**_ installation instructions provided [**here**](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html).
+    The guide discusses two main installation options: **Desktop** and **Bare Bones**.
+
+    #### Choose **one** of the following:
+    - **ROS 2 "Desktop Install"** (`ros-humble-desktop`)
+      Includes a full ROS 2 installation with GUI tools and visualization packages (e.g., Rviz and Gazebo).
+      **Recommended** for users who need simulation or visualization capabilities.
+
+    - **"ROS-Base Install (Bare Bones)"** (`ros-humble-ros-base`)
+      A minimal installation that includes only the core ROS 2 libraries.
+      Suitable for resource-constrained environments or headless systems.
+
+    ```bash
+    # replace <YOUR CHOICE> with either ros-humble-desktop or ros-humble-ros-base
+    sudo apt install <YOUR CHOICE>
+    ```
+    ---
+    Also install the **Development Tools** package:
+    ```bash
+    sudo apt install ros-dev-tools
+    ```
+    Installing the **Desktop** or **Bare Bones** should automatically source the **ROS 2** environment but, under some circumstances you may need to do this again:
+    ```bash
+    source /opt/ros/humble/setup.sh
+    ```
+
+2. **Create a ROS 2 Workspace:**
+   ```bash
+   mkdir -p ~/franka_ros2_ws/src
+   cd ~/franka_ros2_ws  # not into src
+   ```
+3. **Clone the Repositories:**
+   ```bash
+    git clone https://github.com/frankarobotics/franka_ros2.git src
+    ```
+4. **Install the dependencies**
+    ```bash
+    vcs import src < src/franka.repos --recursive --skip-existing
+    ```
+5. **Detect and install project dependencies**
+   ```bash
+   rosdep install --from-paths src --ignore-src --rosdistro humble -y
+   ```
+6. **Build**
+   ```bash
+   # use the --symlinks option to reduce disk usage, and facilitate development.
+   colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+   ```
+7. **Adjust Enviroment**
+   ```bash
+   # Adjust environment to recognize packages and dependencies in your newly built ROS 2 workspace.
+   source install/setup.sh
+   ```
+
+## Docker Container Installation
+The **franka_ros2** package includes a `Dockerfile` and a `docker-compose.yml`, which allows you to use `franka_ros2` packages without manually installing **ROS 2**. Also, the support for Dev Containers in Visual Studio Code is provided.
+
+For detailed instructions, on preparing VSCode to use the `.devcontainer` follow the setup guide from [VSCode devcontainer_setup](https://code.visualstudio.com/docs/devcontainers/tutorial).
+
+1. **Clone the Repositories:**
+    ```bash
+    git clone https://github.com/frankarobotics/franka_ros2.git
+    cd franka_ros2
+    ```
+    We provide separate instructions for using Docker with Visual Studio Code or the command line. Choose one of the following options:
+
+    Option A: Set up and use Docker from the command line (without Visual Studio Code).
+
+    Option B: Set up and use Docker with Visual Studio Code's Docker support.
+
+#### Option A: using Docker Compose
+
+  2. **Save the current user id into a file:**
+      ```bash
+      echo -e "USER_UID=$(id -u $USER)\nUSER_GID=$(id -g $USER)" > .env
+      ```
+      It is needed to mount the folder from inside the Docker container.
+
+  3. **Build the container:**
+      ```bash
+      docker compose build
+      ```
+  4. **Run the container:**
+      ```bash
+      docker compose up -d
+      ```
+  5. **Open a shell inside the container:**
+      ```bash
+      docker exec -it franka_ros2 /bin/bash
+      ```
+  6. **Clone the latests dependencies:**
+      ```bash
+      vcs import src < src/franka.repos --recursive --skip-existing
+      ```
+  7. **Build the workspace:**
+      ```bash
+      colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+      ```
+  7. **Source the built workspace:**
+      ```bash
+      source install/setup.bash
+      ```
+  8. **When you are done, you can exit the shell and delete the container**:
+      ```bash
+      docker compose down -t 0
+      ```
+
+#### Option B: using Dev Containers in Visual Studio Code
+
+  2. **Open Visual Studio Code ...**
+
+        Then, open folder  `franka_ros2`
+
+  3. **Choose `Reopen in container` when prompted.**
+
+      The container will be built automatically, as required.
+
+  4. **Clone the latests dependencies:**
+      ```bash
+      vcs import src < src/franka.repos --recursive --skip-existing
+      ```
+
+  5. **Open a terminal and build the workspace:**
+      ```bash
+      colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+      ```
+  6. **Source the built workspace environment:**
+      ```bash
+      source install/setup.bash
+      ```
 
 
-## Priority list
-* <s>Publishing FrankaState</s>
-* Completely replicate the functionalities of `franka_hw`
-    * <s>Implement joint limits interface (position, velocity, effort)</s> Joint limits are not really working in ros2_control; they need to be implemented at controller level.
-    * <s>Adding different joint interfaces (joint {velocity, position}</s> and cartesian {<s>velocity</s>, pose})
-    * <s>Adding logic for switching to different joint interfaces</s>
-* <s>Adding error recovery services</s>
-    * <s>franka_ros2 crashes right away if the E-stop is pressed or a controller exception occurs.</s>
-    * <s>franka_ros2 does not start if the robot is already in error mode before the node is started.</s>
-* <s>Adding additional example controllers (Cartesian, joint velocity/position, etc. )</s>
-* <s>Add reconfiguration service for:</s>
-    * <s>Cartesian, Joint impedance</s>
-    * <s>Force torque, full collision behaviors</s>
-    * <s>EE, K frames</s>
-    * <s>Load settings</s>
-* Clean up base acceleration-dependent values in Franka State
-* <s>Clean up dependency tree for packages</s>
-* <s>Test it out with moveit! 2</s>
-    * Implement tutorials for multi-arm moveit
-    * bug fixing with SRDF/URDF not finding the `base_link` defined in the dual panda URDF
-    * Implement quality-of-life functions for moveit
-* Investigating multiple arm control
-    * <s>Initialization</s>
-    * <s>Reading joint states</s>
-    * <s>Broadcasting franka states</s>
-    * Controllers for:
-        * Joint-level stuff
-        * Cartesian-level stuff
-    * Splitting all broadcasters into its own nodes
-    * Cleaning up parametrization
-* Test out gripper
-* Make reusable impedance controllers with proper subscribers for general use
-* Add extensive tutorials!
+# Test the build
+   ```bash
+   colcon test
+   ```
+> Remember, franka_ros2 is under development.
+> Warnings can be expected.
 
-## Installation Guide
+# Run a sample ROS 2 application
 
-(Tested on Ubuntu 22.04, ROS2 Humble, Panda FCI 4.0.4, 4.2.2 and 4.2.1, and Libfranka 0.8.0 and 0.9.2)
+To verify that your setup works correctly without a robot, you can run the following command to use dummy hardware:
 
-1. Build libfranka 0.8.0 or 0.9.2 from source by following the [instructions][libfranka-instructions]. Choose proper version according to your FCI version! If you need to install libfranka 0.9.2, you can use directly LCAS [libfranka 0.9.2][libfranka-LCAS] release
-2. Install FLIR Blackfly_s camera ROS2 driver (required for panda_vision setup), following the [instructions][flir_camera_driver]
-3. Clone this repository into your workspace's `src` folder.
-4. Source the workspace, then in your workspace root, call: 
 ```bash
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release -DFranka_DIR:PATH=/path/to/libfranka/build`
+ros2 launch franka_fr3_moveit_config moveit.launch.py robot_ip:=dont-care use_fake_hardware:=true
 ```
-5. Add the build path to your `LD_LIBRARY_PATH`: `LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/path/to/libfranka/build"`
-6. To test, source the workspace, and run: 
+
+If you want to run this example with namespaces, you would need to use the argument `namespace` and manually write your namespace in `moveit.rviz` under `Move Group Namespace`.
+
+# Run a ROS 2 example controller
+
+To run any example controller, make sure to add your desired configuration in `franka.config.yaml` and run:
+
 ```bash
-ros2 launch franka_moveit_config moveit_real_arm_platform.launch.py robot_ip:=<fci-ip> camera_type:=blackfly_s serial:="'<camera-serial>'" load_camera:=True planner:=<planner_name>
+ros2 launch franka_bringup example.launch.py controller_name:=your_desired_controller
 ```
-Example `robot_ip:=172.16.0.2`, `serial:="'22141921'"`, `planner:=pilz_industrial_motion_planner/CommandPlanner` 
+You can select one of the controllers from `controllers.yaml`.
 
-If needed to test on fake hardware add `use_fake_hardware:=True` argument to the launch file
+# Run Gazebo examples with ROS 2
 
-7. To control the arm by MoveIt2 for plant scanning, please follow [moveit2_commander_recorder][moveit2_commander_recorder] and [viewpoint_generator][viewpoint_generator] repositories.
+If you want to use Gazebo to run your code, you can find some examples here: [franka_gazebo](./franka_gazebo/README.md)
+
+
+# Troubleshooting
+#### `libfranka: UDP receive: Timeout error`
+
+If you encounter a UDP receive timeout error while communicating with the robot, avoid using Docker Desktop. It may not provide the necessary real-time capabilities required for reliable communication with the robot. Instead, using Docker Engine is sufficient for this purpose.
+
+A real-time kernel is essential to ensure proper communication and to prevent timeout issues. For guidance on setting up a real-time kernel, please refer to the [Franka installation documentation](https://frankarobotics.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel).
+
+# Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/frankarobotics/franka_ros2/blob/humble/CONTRIBUTING.md) for more details on how to contribute to this project.
 
 ## License
 
-All packages of `franka_arm_ros2` are licensed under the [Apache 2.0 license][apache-2.0], following `franka_ros2` and `panda_ros2`.
+All packages of franka_ros2 are licensed under the Apache 2.0 license.
 
-[apache-2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
+## Contact
 
-[fci-docs]: https://frankaemika.github.io/docs
+For questions or support, please open an issue on the [GitHub Issues](https://github.com/frankarobotics/franka_ros2/issues) page.
 
-[mcbed-humble]: https://github.com/mcbed/franka_ros2/tree/humble
+See the [Franka Control Interface (FCI) documentation](https://frankarobotics.github.io/docs) for more information.
 
-[libfranka-instructions]: https://frankaemika.github.io/docs/installation_linux.html
-
-[flir_camera_driver]: https://github.com/LCAS/flir_camera_driver
-
-[moveit2_commander_recorder]: https://github.com/LCAS/moveit2_commander_recorder
-
-[viewpoint_generator]: https://github.com/LCAS/viewpoint_generator
-
-[libfranka-LCAS]: https://github.com/LCAS/libfranka/tree/lcas_0.9.2
+[def]: #docker-container-installation

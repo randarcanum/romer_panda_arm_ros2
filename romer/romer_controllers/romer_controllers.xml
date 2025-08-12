@@ -1,0 +1,26 @@
+<library path="romer_controllers">
+    <class name="romer_controllers/MoveToStartExampleController"
+           type="romer_controllers::MoveToStartExampleController" base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Moves the robot into default pose.
+        </description>
+    </class>
+    <class name="romer_controllers/JointPositionController"
+           type="romer_controllers::JointPositionController" base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Test ROMER controller. *Hopefully will allow to move the robot from A to B 
+        </description>
+    </class>
+    <class name="romer_controllers/JointPositionControllerWithCV"
+           type="romer_controllers::JointPositionControllerWithCV" base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Test ROMER controller. *Hopefully will allow to move the robot from A to B 
+        </description>
+    </class>
+    <class name="romer_controllers/CartesianPositionController"
+           type="romer_controllers::CartesianPositionController" base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Moves the robot to a joint configuration, read from the /joint_position_target topic.
+        </description>
+    </class>
+</library>
