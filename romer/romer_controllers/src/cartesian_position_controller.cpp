@@ -129,56 +129,47 @@ CallbackReturn CartesianPositionController::on_configure(
     k_gains_(i) = k_gains.at(i);
   }
   moved_ = false;
-  RCLCPP_INFO(get_node()->get_logger(), "Before");
-  auto collision_client = get_node()->create_client<franka_msgs::srv::SetFullCollisionBehavior>(
-      "param_service_server/set_full_collision_behavior");
-  RCLCPP_INFO(get_node()->get_logger(), "After");
-  while (!collision_client->wait_for_service(std::chrono::duration<int64_t, std::milli>(1000))) {
-    if (!rclcpp::ok()) {
-      RCLCPP_ERROR(get_node()->get_logger(), "Interrupted while waiting for the service. Exiting.");
-      return CallbackReturn::ERROR;
-    }
-    RCLCPP_INFO(get_node()->get_logger(), "service not available, waiting again...");
-  }
-  RCLCPP_INFO(get_node()->get_logger(), "After2");
+  // auto collision_client = get_node()->create_client<franka_msgs::srv::SetFullCollisionBehavior>(
+  //     "param_service_server/set_full_collision_behavior");
+  // while (!collision_client->wait_for_service(std::chrono::duration<int64_t, std::milli>(1000))) {
+  //   if (!rclcpp::ok()) {
+  //     RCLCPP_ERROR(get_node()->get_logger(), "Interrupted while waiting for the service. Exiting.");
+  //     return CallbackReturn::ERROR;
+  //   }
+  //   RCLCPP_INFO(get_node()->get_logger(), "service not available, waiting again...");
+  // }
 
-  auto request = std::make_shared<franka_msgs::srv::SetFullCollisionBehavior::Request>();
+  // auto request = std::make_shared<franka_msgs::srv::SetFullCollisionBehavior::Request>();
 
-  request->lower_torque_thresholds_nominal = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->upper_torque_thresholds_nominal = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->lower_torque_thresholds_acceleration = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->upper_torque_thresholds_acceleration = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->lower_force_thresholds_nominal = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->upper_force_thresholds_nominal = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->lower_force_thresholds_acceleration = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
-  request->upper_force_thresholds_acceleration = {
-      100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+  // request->lower_torque_thresholds_nominal = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->upper_torque_thresholds_nominal = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->lower_torque_thresholds_acceleration = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->upper_torque_thresholds_acceleration = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->lower_force_thresholds_nominal = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->upper_force_thresholds_nominal = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->lower_force_thresholds_acceleration = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0};  
+  // request->upper_force_thresholds_acceleration = {
+  //     100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
   // collision_client->async_send_request(request, 
   //             [this](rclcpp::Client<franka_msgs::srv::SetFullCollisionBehavior>::SharedFuture future_result) {
   //                 std::lock_guard<std::mutex> lock(target_mutex_);
 
   //                 auto response = future_result.get();
   //                 if (!response->success) {
-  //                   RCLCPP_FATAL(get_node()->get_logger(), "Failed to set default collision behavior.");
+  //                   RCLCPP_FATAL(get_node()->get_logger(), "Failed to set collision behavior.");
   //                   return CallbackReturn::ERROR;
   //                 } else {
-  //                   RCLCPP_INFO(get_node()->get_logger(), "Default collision behavior set.");
+  //                   RCLCPP_INFO(get_node()->get_logger(), "Collision behavior set.");
   //                 }
   //             });
-  RCLCPP_INFO(get_node()->get_logger(), "After3");
 
-  
-  joint_names_ = {
-      "panda_joint1", "panda_joint2", "panda_joint3",
-      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"
-    };
   return CallbackReturn::SUCCESS;
 }
 

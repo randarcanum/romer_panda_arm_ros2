@@ -24,6 +24,7 @@ add_executable(joint_to_cartesian_service src/joint_to_cartesian_service.cpp)
 add_executable(coriolis_service src/coriolis_service.cpp)
 add_executable(joint_position_publisher src/joint_position_publisher.cpp)
 add_executable(ee_test_publisher src/ee_test_publisher.cpp)
+add_executable(camera_test_publisher src/camera_test_publisher.cpp)
 
 # Link dependencies
 ament_target_dependencies(cartesian_to_joint_service
@@ -65,6 +66,11 @@ ament_target_dependencies(ee_test_publisher
   geometry_msgs
 )
 
+ament_target_dependencies(camera_test_publisher
+  rclcpp
+  geometry_msgs
+)
+
 # Install targets
 install(TARGETS
   cartesian_to_joint_service
@@ -72,6 +78,7 @@ install(TARGETS
   coriolis_service
   joint_position_publisher
   ee_test_publisher
+  camera_test_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
 

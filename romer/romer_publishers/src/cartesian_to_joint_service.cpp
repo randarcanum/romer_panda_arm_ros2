@@ -128,7 +128,6 @@ private:
       }
       response->joint_state = joint_msg;
       publisher_->publish(joint_msg);
-      RCLCPP_INFO(this->get_logger(), "IK solution computed and returned.");
     } else {
       response->success = false;
       RCLCPP_WARN(this->get_logger(), "Failed to compute IK.");

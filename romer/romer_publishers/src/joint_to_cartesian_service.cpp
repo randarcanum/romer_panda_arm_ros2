@@ -87,7 +87,6 @@ private:
         response->pose.pose.orientation.z,
         response->pose.pose.orientation.w
       );
-      RCLCPP_INFO(this->get_logger(), "FK solution computed and returned.");
     } else {
       response->success = false;
       RCLCPP_WARN(this->get_logger(), "Failed to compute FK.");

@@ -11,7 +11,7 @@ class EETestPublisher : public rclcpp::Node {
 public:
   EETestPublisher() : Node("ee_test_publisher"), t_(0.0) {
     publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/ee_pose_target", 10);
-    timer_ = this->create_wall_timer(4500ms, std::bind(&EETestPublisher::timer_callback, this));
+    timer_ = this->create_wall_timer(5000ms, std::bind(&EETestPublisher::timer_callback, this));
     RCLCPP_INFO(this->get_logger(), "EE test publisher started.");
   }
 
@@ -21,12 +21,14 @@ private:
     msg.header.stamp = this->now();
     msg.header.frame_id = "panda_link0";
 
-    double width = 0.2;
-    double height = 0.2;
+    double half_diag = 0.15;
+    double height = 0.55;
+    int a = i_ & 1;
+    int b = i_ >> 1 & 1;
 
-    msg.pose.position.x = 0.4;
-    msg.pose.position.y = -0.5;
-    msg.pose.position.z = 0.55;
+    msg.pose.position.x = 0.4 + (((a | b) & ~a) << 1 | a) * half_diag;
+    msg.pose.position.y = ((((a | b) & ~b) << 1 | ~a & 1) - 1) * half_diag;
+    msg.pose.position.z = height;
     i_++;
 
     msg.pose.orientation.x = 0.0;
@@ -34,9 +36,7 @@ private:
     msg.pose.orientation.z = 0.0;
     msg.pose.orientation.w = 0.0;
 
-    if (i_%2 == 1) publisher_->publish(msg);
-    msg.pose.position.y = 0.0;
-    if (i_%2 == 0) publisher_->publish(msg);
+    publisher_->publish(msg);
   }
 
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher_;
